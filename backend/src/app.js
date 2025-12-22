@@ -1,23 +1,21 @@
 import express from "express";
 import { ENV } from "./config/env.js";
 import path from "path";
-
-const __dirname = path.resolve();
+import authRoutes from "../src/routes/auth.routes.js";
 
 const app = express();
+const __dirname = path.resolve();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.json({ greet: "Hello There!" });
-});
+app.use("/", authRoutes);
 
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  app.get("/{*any}", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "frontend/dist", "index.html"));
   });
 }
 
