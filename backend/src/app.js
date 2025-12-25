@@ -2,11 +2,13 @@ import express from "express";
 import { ENV } from "./config/env.js";
 import path from "path";
 import authRoutes from "../src/routes/auth.routes.js";
+import ExpressError from "./utils/ExpressError.js";
+import errorHandler from "./middlewares/error.middleware.js";
 
 const app = express();
 const __dirname = path.resolve();
 
-app.use(express.json());
+app.use(express.json({ limit: "20kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/", authRoutes);
@@ -18,5 +20,13 @@ if (ENV.NODE_ENV === "production") {
     res.sendFile(path.join(__dirname, "frontend/dist", "index.html"));
   });
 }
+
+// Handle Request For Invalid(404) Routes
+app.use((req, res, next) => {
+  next(new ExpressError(404, "Route not found"));
+});
+
+// Custom Error Handler
+app.use(errorHandler);
 
 export default app;
