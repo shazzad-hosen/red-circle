@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
-import { generateToken } from "../utils/jwt.js";
+import { generateAccessToken } from "../utils/jwt.js";
 import ExpressError from "../utils/ExpressError.js";
 
 // Resister Route Logic
@@ -23,7 +23,7 @@ export const register = async (req, res) => {
     phone,
   });
 
-  const token = generateToken(user);
+  const token = generateAccessToken(user);
 
   res.status(201).json({
     success: true,
@@ -54,7 +54,7 @@ export const login = async (req, res) => {
     throw new ExpressError(401, "Invalid credentials");
   }
 
-  const token = generateToken(user);
+  const token = generateAccessToken(user);
 
   res.json({
     success: true,
