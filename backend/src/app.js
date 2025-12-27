@@ -1,9 +1,10 @@
 import express from "express";
 import { ENV } from "./config/env.js";
 import path from "path";
-import authRoutes from "../src/routes/auth.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import ExpressError from "./utils/ExpressError.js";
 import errorHandler from "./middlewares/error.middleware.js";
+import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 const __dirname = path.resolve();
@@ -12,6 +13,7 @@ app.use(express.json({ limit: "20kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/", authRoutes);
+app.use("/api/users", userRoutes)
 
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
