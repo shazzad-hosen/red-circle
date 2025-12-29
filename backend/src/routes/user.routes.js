@@ -13,6 +13,6 @@ const router = express.Router({ mergeParams: true });
 router.get("/me", protect, getProfile);
 router.patch("/me", protect, asyncHandler(updateProfile));
 router.patch("/availability", protect, asyncHandler(toggleAvailability));
-router.get("/donors", searchDonors);
+router.get("/donors", asyncHandler(searchDonors));
 
 export default router;

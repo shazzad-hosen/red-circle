@@ -71,7 +71,10 @@ export const toggleAvailability = async (req, res) => {
 
 // Donar Search Route
 export const searchDonors = async (req, res) => {
-  const { bloodGroup, city, area } = req.query;
+  const rawBloodGroup = req.query.bloodGroup || "";
+  const bloodGroup = rawBloodGroup.replace(/\s+/g, "+");
+
+  const city = req.query.city;
 
   if (!bloodGroup || !city) {
     throw new ExpressError(400, "bloodGroup and city are required");
@@ -83,13 +86,13 @@ export const searchDonors = async (req, res) => {
     isAvailable: true,
   };
 
-  if (area) {
-    filter["location.area"] = area;
+  if (req.query.area) {
+    filter["location.area"] = req.query.area;
   }
 
-  const donors = await User.find(filter)
-    .select("name bloodGroup location phone lastDonationAt")
-    .sort({ lastDonationAt: 1 });
+  const donors = await User.find(filter).select(
+    "name bloodGroup location phone lastDonationAt"
+  );
 
   res.status(200).json({
     success: true,
