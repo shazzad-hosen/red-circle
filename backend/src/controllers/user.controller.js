@@ -68,3 +68,32 @@ export const toggleAvailability = async (req, res) => {
     message: `Donar is now ${isAvailable ? "available" : "unavailable"}`,
   });
 };
+
+// Donar Search Route
+export const searchDonors = async (req, res) => {
+  const { bloodGroup, city, area } = req.query;
+
+  if (!bloodGroup || !city) {
+    throw new ExpressError(400, "bloodGroup and city are required");
+  }
+
+  const filter = {
+    bloodGroup,
+    "location.city": city,
+    isAvailable: true,
+  };
+
+  if (area) {
+    filter["location.area"] = area;
+  }
+
+  const donors = await User.find(filter)
+    .select("name bloodGroup location phone lastDonationAt")
+    .sort({ lastDonationAt: 1 });
+
+  res.status(200).json({
+    success: true,
+    count: donors.length,
+    donors,
+  });
+};
