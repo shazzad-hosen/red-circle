@@ -3,7 +3,7 @@ import User from "../models/user.model.js";
 import { generateAccessToken } from "../utils/jwt.js";
 import ExpressError from "../utils/ExpressError.js";
 
-// Resister Route Logic
+// Resister Route
 export const register = async (req, res) => {
   const { name, email, password, bloodGroup, location, phone } = req.body;
 
@@ -40,7 +40,7 @@ export const register = async (req, res) => {
   });
 };
 
-// Log in Route Logic
+// Log in Route
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -68,5 +68,13 @@ export const login = async (req, res) => {
       phone: user.phone,
       isAvailable: user.isAvailable,
     },
+  });
+};
+
+// Logout Route
+export const logout = async (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
   });
 };
