@@ -10,7 +10,7 @@ const protect = async (req, res, next) => {
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
   ) {
-    token = req.headers.authorization.split(" ")[1];
+    token = req.headers.authorization.split(" ")[1]; // extracting the token
   }
 
   if (!token) {
@@ -24,7 +24,7 @@ const protect = async (req, res, next) => {
     if (!user) {
       return next(new ExpressError(401, "User no longer exists"));
     }
-    req.user = user;
+    req.user = user; // Attaches the authenticated user object to the request
 
     next();
   } catch (error) {
