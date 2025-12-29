@@ -26,15 +26,18 @@ const userSchema = new mongoose.Schema(
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
       required: true,
       index: true,
+      uppercase: true,
     },
     location: {
       city: {
         type: String,
         index: true,
         required: true,
+        lowercase: true,
       },
       area: {
         type: String,
+        lowercase: true,
       },
     },
     phone: {
