@@ -54,7 +54,17 @@ const userSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+// Donar Eligibility Logic
+userSchema.virtual("isEligible").get(function () {
+  if (!this.lastDonationAt) return true;
+
+  const days =
+    (Date.now() - this.lastDonationAt.getTime()) / (1000 * 60 * 60 * 24);
+
+  return days >= 90; // return a boolean value
+});
 
 export default mongoose.model("User", userSchema);
