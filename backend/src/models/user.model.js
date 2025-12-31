@@ -46,12 +46,12 @@ const userSchema = new mongoose.Schema(
     },
     isAvailable: {
       type: Boolean,
-      default: true,
+      default: false,
       index: true,
     },
     lastDonationAt: {
       type: Date,
-      default: Date.now,
+      default: null,
     },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }

@@ -81,22 +81,41 @@ export const searchDonors = async (req, res) => {
     throw new ExpressError(400, "bloodGroup and city are required");
   }
 
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
   const filter = {
     bloodGroup,
     "location.city": city,
     isAvailable: true,
+    $or: [
+      { lastDonationAt: { $lte: ninetyDaysAgo } },
+      { lastDonationAt: { $exists: false } },
+    ],
   };
 
   if (area) {
     filter["location.area"] = area;
   }
 
-  const donors = await User.find(filter).select(
-    "name bloodGroup location phone lastDonationAt"
-  );
+  const donors = await User.find(filter)
+    .select("name bloodGroup location phone lastDonationAt isEligible")
+    .sort({ lastDonationAt: 1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await User.countDocuments(filter);
 
   res.status(200).json({
     success: true,
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
     count: donors.length,
     donors,
   });
