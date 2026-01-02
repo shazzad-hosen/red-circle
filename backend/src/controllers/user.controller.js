@@ -46,25 +46,23 @@ export const updateProfile = async (req, res) => {
   });
 };
 
-// Donor Availability Route
+// Donor Availability Toggler Route
 export const toggleAvailability = async (req, res) => {
-  const { isAvailable } = req.body;
+  const userId = req.user._id;
 
-  if (typeof isAvailable !== "boolean") {
-    throw new ExpressError(400, "isAvailable must be true or false");
-  }
-
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(userId);
 
   if (!user) {
     throw new ExpressError(404, "User not found");
   }
 
-  user.isAvailable = isAvailable;
+  user.isAvailable = !user.isAvailable;
 
   await user.save();
+
   res.status(200).json({
     success: true,
+    isAvailable: user.isAvailable,
     message: `Donar is now ${isAvailable ? "available" : "unavailable"}`,
   });
 };
