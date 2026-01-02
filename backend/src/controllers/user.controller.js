@@ -11,13 +11,7 @@ export const getProfile = (req, res) => {
 
 // Update Profile Route
 export const updateProfile = async (req, res) => {
-  const allowedFields = [
-    "name",
-    "phone",
-    "location",
-    "bloodGroup",
-    "isAvailable",
-  ];
+  const allowedFields = ["name", "phone", "location", "bloodGroup"];
 
   const updates = {};
 
@@ -116,5 +110,45 @@ export const searchDonors = async (req, res) => {
     totalPages: Math.ceil(total / limit),
     count: donors.length,
     donors,
+  });
+};
+
+// Donation Update Route
+export const updateDonation = async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new ExpressError(404, "User not found");
+  }
+
+  const currentDate = Date.now();
+
+  if (user.lastDonationAt) {
+    const daysSinceLastDonation =
+      (currentDate - user.lastDonationAt.getDate()) / (1000 * 60 * 60 * 24);
+
+    if (daysSinceLastDonation < 90) {
+      throw new ExpressError(
+        400,
+        `You can donate again after ${Math.ceil(
+          90 - daysSinceLastDonation
+        )} days`
+      );
+    }
+  }
+
+  user.lastDonationAt = currentDate;
+  user.isAvailable = false;
+
+  await user.save();
+
+  res.send(200).json({
+    success: true,
+    message: "Donation recorded successfully",
+    lastDonationAt: user.lastDonationAt,
+    isAvailable: user.isAvailable,
+    eligibleAfterDays: 90,
   });
 };

@@ -6,13 +6,18 @@ import {
   updateProfile,
   toggleAvailability,
   searchDonors,
+  updateDonation,
 } from "../controllers/user.controller.js";
 
 const router = express.Router({ mergeParams: true });
 
-router.get("/me", protect, getProfile);
-router.patch("/me", protect, asyncHandler(updateProfile));
+router
+  .route("/me")
+  .get(protect, getProfile)
+  .patch(protect, asyncHandler(updateProfile));
+
 router.patch("/availability", protect, asyncHandler(toggleAvailability));
 router.get("/donors", asyncHandler(searchDonors));
+router.patch("/donation", protect, asyncHandler(updateDonation));
 
 export default router;
