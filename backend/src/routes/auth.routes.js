@@ -5,7 +5,7 @@ import validateRegister from "../middlewares/validateRegister.middleware.js";
 import validateLogin from "../middlewares/validateLogin.middleware.js";
 import protect from "../middlewares/auth.middleware.js";
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 
 router.post("/register", validateRegister, asyncHandler(register));
 router.post("/login", validateLogin, asyncHandler(login));

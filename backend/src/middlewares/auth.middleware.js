@@ -24,6 +24,7 @@ const protect = async (req, res, next) => {
     if (!user) {
       return next(new ExpressError(401, "User no longer exists"));
     }
+    
     req.user = user; // Attaches the authenticated user object to the request
 
     next();

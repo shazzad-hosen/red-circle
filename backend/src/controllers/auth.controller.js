@@ -8,6 +8,7 @@ export const register = async (req, res) => {
   const { name, email, password, bloodGroup, location, phone } = req.body;
 
   const existingUser = await User.findOne({ email });
+  
   if (existingUser) {
     throw new ExpressError(400, "Email already registered");
   }
@@ -45,11 +46,13 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email }).select("+password");
+
   if (!user) {
     throw new ExpressError(401, "Invalid credentials");
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
+
   if (!isMatch) {
     throw new ExpressError(401, "Invalid credentials");
   }

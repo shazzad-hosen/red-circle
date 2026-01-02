@@ -9,7 +9,7 @@ import {
   updateDonation,
 } from "../controllers/user.controller.js";
 
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 
 router
   .route("/me")
