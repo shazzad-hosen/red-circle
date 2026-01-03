@@ -14,7 +14,7 @@ import {
   searchLimiter,
 } from "../middlewares/rateLimit.middleware.js";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router
   .route("/me")

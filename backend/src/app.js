@@ -12,7 +12,7 @@ const __dirname = path.resolve();
 app.use(express.json({ limit: "20kb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
 if (ENV.NODE_ENV === "production") {
