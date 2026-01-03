@@ -2,13 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const Login = () => {
+const Register = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
+    bloodGroup: "",
+    location: {
+      city: "",
+    },
+    phone: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -17,7 +23,15 @@ const Login = () => {
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "city") {
+      setForm((prev) => ({
+        ...prev,
+        location: { ...prev.location, city: value },
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   // Submit form
@@ -27,13 +41,13 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(form);
+      await register(form);
       navigate("/profile");
     } catch (err) {
       if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
-        setError(err.message || "Invalid email or password");
+        setError(err.message || "Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -44,7 +58,7 @@ const Login = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-5 sm:p-6 space-y-6">
         <h2 className="text-xl sm:text-2xl font-bold text-center text-gray-800">
-          Login
+          Create Account
         </h2>
 
         {error && (
@@ -54,6 +68,14 @@ const Login = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            label="Name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
+
           <Input
             label="Email"
             name="email"
@@ -72,6 +94,44 @@ const Login = () => {
             required
           />
 
+          {/* Blood Group */}
+          <div className="flex flex-col space-y-1">
+            <label className="text-sm text-gray-600">Blood Group</label>
+            <select
+              name="bloodGroup"
+              value={form.bloodGroup}
+              onChange={handleChange}
+              required
+              className="border rounded-xl px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="">Select blood group</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
+            </select>
+          </div>
+
+          <Input
+            label="City"
+            name="city"
+            value={form.location.city}
+            onChange={handleChange}
+            required
+          />
+
+          <Input
+            label="Phone"
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+            placeholder="Optional"
+          />
+
           <button
             type="submit"
             disabled={loading}
@@ -84,17 +144,17 @@ const Login = () => {
               disabled:cursor-not-allowed
             "
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
         <p className="text-sm text-gray-500 text-center">
-          Don&apos;t have an account?{" "}
+          Already have an account?{" "}
           <span
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/login")}
             className="text-red-600 cursor-pointer hover:underline"
           >
-            Register
+            Login
           </span>
         </p>
       </div>
@@ -102,7 +162,7 @@ const Login = () => {
   );
 };
 
-// Reusable Input component (same as Register)
+// Reusable Input component
 const Input = ({
   label,
   name,
@@ -133,4 +193,4 @@ const Input = ({
   </div>
 );
 
-export default Login;
+export default Register;
