@@ -5,9 +5,14 @@ import {
   getProfile,
   updateProfile,
   toggleAvailability,
-  searchDonors,
   updateDonation,
+  searchDonors,
 } from "../controllers/user.controller.js";
+import {
+  donationLimiter,
+  availabilityLimiter,
+  searchLimiter,
+} from "../middlewares/rateLimit.middleware.js";
 
 const router = express.Router();
 
@@ -16,8 +21,20 @@ router
   .get(protect, getProfile)
   .patch(protect, asyncHandler(updateProfile));
 
-router.patch("/availability", protect, asyncHandler(toggleAvailability));
-router.get("/donors", asyncHandler(searchDonors));
-router.patch("/donation", protect, asyncHandler(updateDonation));
+router.patch(
+  "/donation",
+  protect,
+  donationLimiter,
+  asyncHandler(updateDonation)
+);
+
+router.patch(
+  "/availability",
+  protect,
+  availabilityLimiter,
+  asyncHandler(toggleAvailability)
+);
+
+router.get("/donors", searchLimiter, asyncHandler(searchDonors));
 
 export default router;
