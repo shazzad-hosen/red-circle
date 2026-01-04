@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
       city: {
         type: String,
         index: true,
-        required: true,
+        required: [true, "City is required"],
         lowercase: true,
       },
       area: {
@@ -52,6 +52,10 @@ const userSchema = new mongoose.Schema(
     lastDonationAt: {
       type: Date,
       default: null,
+    },
+    refreshToken: {
+      type: String,
+      select: false,
     },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
