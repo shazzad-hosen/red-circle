@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const res = await getProfile();
-        setUser(res.user || res.data); // depending on backend structure
+        setUser(res.data.user);
       } catch (err) {
         localStorage.removeItem("token");
         setUser(null);
@@ -32,19 +32,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (data) => {
-    const res = await loginUser(data); // axios response
-    const { token, user } = res.data; // ✅ correct extraction
-
-    localStorage.setItem("token", token);
-    setUser(user);
+    const res = await loginUser(data);
+    localStorage.setItem("token", res.data.token);
+    setUser(res.data.user);
   };
 
   const register = async (data) => {
-    const res = await registerUser(data); // axios response
-    const { token, user } = res.data;
-
-    localStorage.setItem("token", token);
-    setUser(user);
+    const res = await registerUser(data);
+    localStorage.setItem("token", res.data.token);
+    setUser(res.data.user);
   };
 
   // Logout
