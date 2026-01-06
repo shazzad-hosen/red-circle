@@ -17,7 +17,7 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
-    const user = await User.findById(decoded.id).select("-password"); // password filed excluded
+    const user = await User.findById(decoded.id).select("-password -refreshToken");
 
     if (!user) {
       return next(new ExpressError(401, "User no longer exists"));

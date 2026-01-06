@@ -5,7 +5,9 @@ import ExpressError from "../utils/ExpressError.js";
 export const getProfile = (req, res) => {
   res.status(200).json({
     success: true,
-    user: req.user,
+    data: {
+      user: req.user,
+    },
   });
 };
 
@@ -28,7 +30,7 @@ export const updateProfile = async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
     new: true,
     runValidators: true,
-  }).select("-password");
+  }).select("-password -refreshToken");
 
   if (!updatedUser) {
     throw new ExpressError(404, "User not found");
@@ -36,7 +38,16 @@ export const updateProfile = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    user: updatedUser,
+    message: "User updation successful",
+    data: {
+      id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      bloodGroup: updatedUser.bloodGroup,
+      location: updatedUser.location,
+      phone: updatedUser.phone,
+      isAvailable: updatedUser.isAvailable,
+    },
   });
 };
 
@@ -45,7 +56,6 @@ export const toggleAvailability = async (req, res) => {
   const userId = req.user._id;
 
   const user = await User.findById(userId);
-
   if (!user) {
     throw new ExpressError(404, "User not found");
   }
@@ -56,21 +66,21 @@ export const toggleAvailability = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    isAvailable: user.isAvailable,
-    message: `Donar is now ${isAvailable ? "available" : "unavailable"}`,
+    message: `Donor is now ${user.isAvailable ? "available" : "unavailable"}`,
+    data: {
+      isAvailable: user.isAvailable,
+    },
   });
 };
 
 // Donar Search Route
 export const searchDonors = async (req, res) => {
-  const rawBloodGroup = req.query.bloodGroup || "";
-  const bloodGroup = rawBloodGroup.replace(/\s+/g, "+").toUpperCase();
-
+  const bloodGroup = req.query.bloodGroup?.replace(/\s+/g, "+").toUpperCase();
   const city = req.query.city?.toLowerCase().trim();
   const area = req.query.area?.toLowerCase().trim();
 
   if (!bloodGroup || !city) {
-    throw new ExpressError(400, "bloodGroup and city are required");
+    throw new ExpressError(400, "Blood group and city are required");
   }
 
   const page = parseInt(req.query.page) || 1;
@@ -104,12 +114,13 @@ export const searchDonors = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    page,
-    limit,
-    total,
-    totalPages: Math.ceil(total / limit),
-    count: donors.length,
-    donors,
+    data: {
+      page,
+      total,
+      count: donors.length,
+      donors,
+      totalPages: Math.ceil(total / limit),
+    },
   });
 };
 
@@ -118,7 +129,6 @@ export const updateDonation = async (req, res) => {
   const userId = req.user._id;
 
   const user = await User.findById(userId);
-
   if (!user) {
     throw new ExpressError(404, "User not found");
   }
@@ -126,15 +136,13 @@ export const updateDonation = async (req, res) => {
   const currentDate = Date.now();
 
   if (user.lastDonationAt) {
-    const daysSinceLastDonation =
-      (currentDate - user.lastDonationAt.getDate()) / (1000 * 60 * 60 * 24);
+    const daysSince =
+      (currentDate - user.lastDonationAt.getTime()) / (1000 * 60 * 60 * 24);
 
-    if (daysSinceLastDonation < 90) {
+    if (daysSince < 90) {
       throw new ExpressError(
         400,
-        `You can donate again after ${Math.ceil(
-          90 - daysSinceLastDonation
-        )} days`
+        `You can donate again after ${Math.ceil(90 - daysSince)} days`
       );
     }
   }
@@ -144,11 +152,13 @@ export const updateDonation = async (req, res) => {
 
   await user.save();
 
-  res.send(200).json({
+  res.status(200).json({
     success: true,
     message: "Donation recorded successfully",
-    lastDonationAt: user.lastDonationAt,
-    isAvailable: user.isAvailable,
-    eligibleAfterDays: 90,
+    data: {
+      lastDonationAt: user.lastDonationAt,
+      isAvailable: user.isAvailable,
+      eligibleAfterDays: 90,
+    },
   });
 };

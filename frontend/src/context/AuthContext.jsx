@@ -1,27 +1,22 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getProfile } from "../api/user.api";
 import { loginUser, logoutUser, registerUser } from "../api/auth.api";
+import api from "../api/axios";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user on app start
+  // Load user on app start (uses refresh token silently)
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
         const res = await getProfile();
-        setUser(res.data.user);
+        setUser(res.data.data.user);
       } catch (err) {
-        localStorage.removeItem("token");
         setUser(null);
       } finally {
         setLoading(false);
@@ -31,16 +26,29 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  // Attach access token to axios
+  useEffect(() => {
+    if (accessToken) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    } else {
+      delete api.defaults.headers.common["Authorization"];
+    }
+  }, [accessToken]);
+
+  // Login
   const login = async (data) => {
     const res = await loginUser(data);
-    localStorage.setItem("token", res.data.token);
-    setUser(res.data.user);
+
+    setAccessToken(res.data.data.accessToken);
+    setUser(res.data.data.user);
   };
 
+  // Register
   const register = async (data) => {
     const res = await registerUser(data);
-    localStorage.setItem("token", res.data.token);
-    setUser(res.data.user);
+
+    setAccessToken(res.data.data.accessToken);
+    setUser(res.data.data.user);
   };
 
   // Logout
@@ -48,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await logoutUser();
     } finally {
-      localStorage.removeItem("token");
+      setAccessToken(null);
       setUser(null);
     }
   };
@@ -57,12 +65,11 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        setUser,
         isAuthenticated: !!user,
         loading,
         login,
-        logout,
         register,
+        logout,
       }}
     >
       {children}
@@ -70,4 +77,10 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+  return ctx;
+};

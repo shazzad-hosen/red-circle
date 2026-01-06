@@ -8,8 +8,8 @@ import { ENV } from "../config/env.js";
 export const register = async (req, res) => {
   const { name, email, password, bloodGroup, location, phone } = req.body;
 
-  if (!req.body) {
-    throw new ExpressError(400, "All fields are required");
+  if (!name || !email || !password || !bloodGroup || !location?.city) {
+    throw new ExpressError(400, "Missing required fields");
   }
 
   const existingUser = await User.findOne({ email });
@@ -63,7 +63,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select("+password +refreshToken");
   if (!user) {
     throw new ExpressError(401, "Invalid credentials");
   }
@@ -104,30 +104,6 @@ export const login = async (req, res) => {
   });
 };
 
-// Logout Route
-export const logout = async (req, res) => {
-  const token = req.cookies?.refreshToken;
-
-  if (token) {
-    const user = await User.findOne({ refreshToken: token });
-    if (user) {
-      user.refreshToken = null;
-      await user.save();
-    }
-  }
-
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: ENV.NODE_ENV === "production",
-    sameSite: "strict",
-  });
-
-  res.status(200).json({
-    success: true,
-    message: "Logged out successfully",
-  });
-};
-
 // Refresh Token
 export const refreshToken = async (req, res) => {
   const token = req.cookies?.refreshToken;
@@ -155,5 +131,29 @@ export const refreshToken = async (req, res) => {
     data: {
       accessToken: newAccessToken,
     },
+  });
+};
+
+// Logout Route
+export const logout = async (req, res) => {
+  const token = req.cookies?.refreshToken;
+
+  if (token) {
+    const user = await User.findOne({ refreshToken: token });
+    if (user) {
+      user.refreshToken = null;
+      await user.save();
+    }
+  }
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: ENV.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
   });
 };
