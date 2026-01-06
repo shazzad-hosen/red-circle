@@ -106,7 +106,7 @@ export const login = async (req, res) => {
 
 // Logout Route
 export const logout = async (req, res) => {
-  const token = req.cookies.refreshToken;
+  const token = req.cookies?.refreshToken;
 
   if (token) {
     const user = await User.findOne({ refreshToken: token });
@@ -130,22 +130,27 @@ export const logout = async (req, res) => {
 
 // Refresh Token
 export const refreshToken = async (req, res) => {
-  const token = req.cookies.refreshToken;
+  const token = req.cookies?.refreshToken;
 
   if (!token) {
-    throw new ExpressError(401, "No refresh token");
+    throw new ExpressError(401, "Refresh token missing");
   }
 
-  const decoded = jwt.verify(token, ENV.REFRESH_TOKEN_SECRET);
+  let decoded;
+  try {
+    decoded = jwt.verify(token, ENV.REFRESH_TOKEN_SECRET);
+  } catch (err) {
+    throw new ExpressError(401, "Invalid or expired refresh token");
+  }
 
   const user = await User.findById(decoded.id).select("+refreshToken");
   if (!user || user.refreshToken !== token) {
-    throw new ExpressError(401, "Invalid refresh token");
+    throw new ExpressError(401, "Refresh token mismatch");
   }
 
-  const newAccessToken = generateAccessToken(user._id);
+  const newAccessToken = generateAccessToken(user);
 
-  res.json({
+  res.status(200).json({
     success: true,
     data: {
       accessToken: newAccessToken,

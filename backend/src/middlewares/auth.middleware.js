@@ -4,13 +4,11 @@ import ExpressError from "../utils/ExpressError.js";
 import { ENV } from "../config/env.js";
 
 const protect = async (req, res, next) => {
+  const authHeader = req.headers?.authorization;
   let token;
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1]; // extracting the token
+  if (authHeader?.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1]; // extracting the actual token
   }
 
   if (!token) {
@@ -24,7 +22,7 @@ const protect = async (req, res, next) => {
     if (!user) {
       return next(new ExpressError(401, "User no longer exists"));
     }
-    
+
     req.user = user; // Attaches the authenticated user object to the request
 
     next();
