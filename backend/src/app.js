@@ -1,6 +1,5 @@
 import express from "express";
 import { ENV } from "./config/env.js";
-import path from "path";
 import ExpressError from "./utils/ExpressError.js";
 import errorHandler from "./middlewares/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -9,7 +8,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 const app = express();
-const __dirname = path.resolve();
 
 app.use(cookieParser());
 app.use(
@@ -22,16 +20,12 @@ app.use(
 app.use(express.json({ limit: "20kb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/auth", authRoutes);
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Backend API is running successfully" });
+});
+
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-
-if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "frontend/dist", "index.html"));
-  });
-}
 
 // Handle Request For Invalid(404) Routes
 app.use((req, res, next) => {

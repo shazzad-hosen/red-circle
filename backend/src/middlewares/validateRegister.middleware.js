@@ -26,8 +26,8 @@ const validateRegister = (req, res, next) => {
     throw new ExpressError(400, "This email domain is not allowed");
   }
 
-  if (password.length < 6) {
-    throw new ExpressError(400, "Password must be at least 6 characters");
+  if (password.length < 7) {
+    throw new ExpressError(400, "Password must be at least 7 characters");
   }
 
   next();

@@ -6,7 +6,13 @@ export const getProfile = (req, res) => {
   res.status(200).json({
     success: true,
     data: {
-      user: req.user,
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      bloodGroup: req.user.bloodGroup,
+      location: req.user.location,
+      phone: req.user.phone,
+      isAvailable: req.user.isAvailable,
     },
   });
 };
@@ -116,10 +122,11 @@ export const searchDonors = async (req, res) => {
     success: true,
     data: {
       page,
+      limit,
       total,
       count: donors.length,
-      donors,
       totalPages: Math.ceil(total / limit),
+      donors,
     },
   });
 };
