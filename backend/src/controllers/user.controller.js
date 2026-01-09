@@ -79,7 +79,7 @@ export const toggleAvailability = async (req, res) => {
   });
 };
 
-// Donar Search Route
+// Donor Search Route
 export const searchDonors = async (req, res) => {
   const bloodGroup = req.query.bloodGroup?.replace(/\s+/g, "+").toUpperCase();
   const city = req.query.city?.toLowerCase().trim();

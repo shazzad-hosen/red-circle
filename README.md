@@ -1,9 +1,10 @@
 # 🔴 Red Circle – Backend API
 
 Red Circle is a blood donation management backend built with **Node.js**, **Express**, and **MongoDB**.
-It provides **secure authentication**, **donor availability tracking**, **donar searching** based on **location** and **blood group**, **donation timing rules**, and **rate-limited APIs** to prevent abuse.
+It provides **secure authentication**, **donor availability tracking**, **donor searching** based on **location** and **blood group**, **donation timing rules**, and **rate-limited APIs** to prevent abuse.
 
-## This repository contains backend only (frontend is handled separately).
+> This repository contains backend only (frontend is handled separately).
+
 
 ## 🚀 Features
 
@@ -98,15 +99,26 @@ Red-Circle
 
 ## ⚙️ Environment Variables
 
-**Create a .env file inside the backend folder:**
-```
+
+> Create a `.env` file inside the **backend** folder and add the following:
+
+```env
+# Server
 PORT=3000
-DB_URL=add_your_mongo_db_url
 NODE_ENV=development
+
+# Database
+DB_URL=add_your_mongo_db_url
+
+# JWT
 ACCESS_TOKEN_SECRET=your_access_token_secret
 ACCESS_TOKEN_EXPIRY=15m
+
 REFRESH_TOKEN_SECRET=your_refresh_token_secret
 REFRESH_TOKEN_EXPIRY=7d
+
+# CORS (Frontend URL - optional)
+# Set this if you connect a frontend from a different origin
 CLIENT_URL=http://localhost:5173
 
 ```
@@ -130,10 +142,10 @@ http://localhost:3000/
 ```
 
 ## 🔑 API Overview
-### Donar Search Route
+### Donor Search Route
 | **Method** | **Endpoint** | **Description** |
 |----------|-------------|-----------------|
-| **GET**  | `/api/users/donors?`  | Search For a Donar |
+| **GET**  | `/api/users/donors?`  | Search For a Donor |
 
 ### Auth Routes
 | **Method** | **Endpoint** | **Description** |
@@ -143,7 +155,7 @@ http://localhost:3000/
 | **POST** | `/api/auth/logout` | Logout user |
 | **POST** | `/api/auth/refresh` | Refresh access token |
 
-### User/Donar Routes (Protected)
+### User/Donor Routes (Protected)
 #### 🔒 Requires Authorization: Bearer (token)
 
 | **Method** | **Endpoint** | **Description** |
@@ -153,6 +165,28 @@ http://localhost:3000/
 | **PATCH** | `/api/users/availability` | Toggle donor availability |
 | **PATCH** | `/api/users/donation` | Update donation date |
 
+## 🌐 Live API (Test)
+
+Base URL: https://red-circle-backend.onrender.com
+
+> ⚠️ This is a **test environment**.  
+> Data may be reset at any time.
+
+### Example: Register
+
+```http
+POST https://red-circle-backend.onrender.com/api/auth/register
+```
+```json
+{
+    "name": "John Doe",
+    "email": "johndoe2026@gmail.com",
+    "password": "password321",
+    "bloodGroup": "AB+",
+    "location": { "city": "Dhaka", "area": "Gulsan" },
+    "phone": "01700000000"
+}
+```
 
 ## 🛡 Security Notes
 

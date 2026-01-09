@@ -134,7 +134,7 @@ export const refreshToken = async (req, res) => {
   });
 };
 
-// Logout Route
+// Log out Route
 export const logout = async (req, res) => {
   const token = req.cookies?.refreshToken;
 

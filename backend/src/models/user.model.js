@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// Donar Eligibility Logic
+// Donor Eligibility Logic
 userSchema.virtual("isEligible").get(function () {
   if (!this.lastDonationAt) return true;
 
