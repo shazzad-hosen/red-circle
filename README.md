@@ -18,7 +18,7 @@ It provides **secure authentication**, **donor availability tracking**, **donor 
 
 - Profile fetch
 
-- Profile Update
+- Profile update
 
 - Secure protected routes
 
@@ -145,7 +145,7 @@ http://localhost:3000/
 ### Donor Search Route
 | **Method** | **Endpoint** | **Description** |
 |----------|-------------|-----------------|
-| **GET**  | `/api/users/donors?`  | Search For a Donor |
+| **GET**  | `/api/users/donors?`  | Search for a donor |
 
 ### Auth Routes
 | **Method** | **Endpoint** | **Description** |
@@ -160,8 +160,8 @@ http://localhost:3000/
 
 | **Method** | **Endpoint** | **Description** |
 |----------|-------------|-----------------|
-| **GET**   | `/api/users/me`              | Get Profile |
-| **PATCH** | `/api/users/me`              | Update Profile | 
+| **GET**   | `/api/users/me`              | Get profile |
+| **PATCH** | `/api/users/me`              | Update profile | 
 | **PATCH** | `/api/users/availability` | Toggle donor availability |
 | **PATCH** | `/api/users/donation` | Update donation date |
 
