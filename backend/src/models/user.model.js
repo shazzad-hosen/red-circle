@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
@@ -8,6 +9,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
+
     email: {
       type: String,
       required: true,
@@ -16,11 +18,13 @@ const userSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+
     password: {
       type: String,
       required: true,
       select: false,
     },
+
     bloodGroup: {
       type: String,
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
@@ -28,6 +32,7 @@ const userSchema = new mongoose.Schema(
       index: true,
       uppercase: true,
     },
+
     location: {
       city: {
         type: String,
@@ -35,31 +40,50 @@ const userSchema = new mongoose.Schema(
         required: [true, "City is required"],
         lowercase: true,
       },
+
       area: {
         type: String,
         lowercase: true,
       },
     },
+
     phone: {
       type: String,
       required: true,
     },
+
     isAvailable: {
       type: Boolean,
       default: false,
       index: true,
     },
+
     lastDonationAt: {
       type: Date,
       default: null,
     },
+
     refreshToken: {
       type: String,
       select: false,
     },
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 // Donor Eligibility Logic
 userSchema.virtual("isEligible").get(function () {
@@ -68,7 +92,7 @@ userSchema.virtual("isEligible").get(function () {
   const days =
     (Date.now() - this.lastDonationAt.getTime()) / (1000 * 60 * 60 * 24);
 
-  return days >= 90; // return a boolean value
+  return days >= 90;
 });
 
-export default mongoose.model("User", userSchema);
+export const User = mongoose.model("User", userSchema);
