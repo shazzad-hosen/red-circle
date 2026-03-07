@@ -1,44 +1,20 @@
+import { registerUser } from "../services/auth.services.js";
+
 import bcrypt from "bcrypt";
-import User from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 import ExpressError from "../utils/ExpressError.js";
 import { ENV } from "../config/env.js";
+import parseExpiryToMs from "../utils/parseExpiry.js";
 
-// Resister Route
-export const register = async (req, res) => {
-  const { name, email, password, bloodGroup, location, phone } = req.body;
+export const registerUserController = async (req, res) => {
+  const result = registerUser(req.body);
 
-  if (!name || !email || !password || !bloodGroup || !location?.city) {
-    throw new ExpressError(400, "Missing required fields");
-  }
-
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new ExpressError(400, "Email already registered");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-    bloodGroup,
-    location,
-    phone,
-  });
-
-  const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
-
-  user.refreshToken = refreshToken;
-  await user.save();
-
-  res.cookie("refreshToken", refreshToken, {
+  res.cookie("refreshToken", result.refreshToken, {
     httpOnly: true,
     secure: ENV.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: parseExpiryToMs(ENV.REFRESH_TOKEN_EXPIRY),
   });
 
   res.status(201).json({
@@ -46,15 +22,7 @@ export const register = async (req, res) => {
     message: "Registration successful",
     data: {
       accessToken,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        bloodGroup: user.bloodGroup,
-        location: user.location,
-        phone: user.phone,
-        isAvailable: user.isAvailable,
-      },
+      user: result.user,
     },
   });
 };
