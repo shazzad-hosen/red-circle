@@ -1,9 +1,17 @@
 import express from "express";
-import * as authController from "../controllers/auth.controller.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import validateRegister from "../middlewares/validateRegister.middleware.js";
 import validateLogin from "../middlewares/validateLogin.middleware.js";
 import protect from "../middlewares/auth.middleware.js";
+import verifyRefreshToken from "../middlewares/verifyRefreshToken.middleware.js";
+
+import {
+  registerUserController,
+  loginUserController,
+  refreshUserTokenController,
+  logoutUserController,
+} from "../controllers/auth.controller.js";
+
 import {
   registerLimiter,
   loginLimiter,
@@ -15,17 +23,22 @@ router.post(
   "/register",
   registerLimiter,
   validateRegister,
-  asyncHandler(authController.register)
+  asyncHandler(registerUserController),
 );
 
 router.post(
   "/login",
   loginLimiter,
   validateLogin,
-  asyncHandler(authController.login)
+  asyncHandler(loginUserController),
 );
 
-router.post("/refresh", asyncHandler(authController.refreshToken));
-router.post("/logout", protect, authController.logout);
+router.post(
+  "/refresh",
+  verifyRefreshToken,
+  asyncHandler(refreshUserTokenController),
+);
+
+router.post("/logout", protect, asyncHandler(logoutUserController));
 
 export default router;
