@@ -1,58 +1,42 @@
-import User from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 import ExpressError from "../utils/ExpressError.js";
 
-// Get Profile Route
-export const getProfile = (req, res) => {
+import {
+  getUserProfile,
+  updateUserProfile,
+} from "../services/user.services.js";
+
+export const getUserProfileController = async (req, res) => {
+  const result = await getUserProfile(req.user);
+
   res.status(200).json({
     success: true,
     data: {
-      id: req.user._id,
-      name: req.user.name,
-      email: req.user.email,
-      bloodGroup: req.user.bloodGroup,
-      location: req.user.location,
-      phone: req.user.phone,
-      isAvailable: req.user.isAvailable,
+      id: result.user._id,
+      name: result.user.name,
+      email: result.user.email,
+      bloodGroup: result.user.bloodGroup,
+      location: result.user.location,
+      phone: result.user.phone,
+      isAvailable: result.user.isAvailable,
     },
   });
 };
 
-// Update Profile Route
-export const updateProfile = async (req, res) => {
-  const allowedFields = ["name", "phone", "location", "bloodGroup"];
-
-  const updates = {};
-
-  allowedFields.forEach((field) => {
-    if (req.body[field] !== undefined) {
-      updates[field] = req.body[field];
-    }
-  });
-
-  if (Object.keys(updates).length === 0) {
-    throw new ExpressError(400, "No valid fields to update");
-  }
-
-  const updatedUser = await User.findByIdAndUpdate(req.user._id, updates, {
-    new: true,
-    runValidators: true,
-  }).select("-password -refreshToken");
-
-  if (!updatedUser) {
-    throw new ExpressError(404, "User not found");
-  }
+export const updateUserProfileController = async (req, res) => {
+  const result = await updateUserProfile(req.body, req.user._id);
 
   res.status(200).json({
     success: true,
     message: "User updation successful",
     data: {
-      id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      bloodGroup: updatedUser.bloodGroup,
-      location: updatedUser.location,
-      phone: updatedUser.phone,
-      isAvailable: updatedUser.isAvailable,
+      id: result.user._id,
+      name: result.user.name,
+      email: result.user.email,
+      bloodGroup: result.user.bloodGroup,
+      location: result.user.location,
+      phone: result.user.phone,
+      isAvailable: result.user.isAvailable,
     },
   });
 };
@@ -149,7 +133,7 @@ export const updateDonation = async (req, res) => {
     if (daysSince < 90) {
       throw new ExpressError(
         400,
-        `You can donate again after ${Math.ceil(90 - daysSince)} days`
+        `You can donate again after ${Math.ceil(90 - daysSince)} days`,
       );
     }
   }
