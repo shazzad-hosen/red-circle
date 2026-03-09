@@ -8,6 +8,7 @@ const validateRegister = (req, res, next) => {
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
   if (!emailRegex.test(email)) {
     throw new ExpressError(400, "Please enter a valid email address");
   }
@@ -23,7 +24,7 @@ const validateRegister = (req, res, next) => {
 
   const domain = email.split("@")[1]?.toLowerCase();
   if (!allowedDomains.includes(domain)) {
-    throw new ExpressError(400, "This email domain is not allowed");
+    throw new ExpressError(400, "This email format is not allowed");
   }
 
   if (password.length < 7) {

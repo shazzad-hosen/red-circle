@@ -14,10 +14,10 @@ app.use(
   cors({
     origin: ENV.CLIENT_URL,
     credentials: true,
-  })
+  }),
 );
 
-app.use(express.json({ limit: "20kb" }));
+app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
@@ -27,12 +27,10 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
-// Handle Request For Invalid(404) Routes
 app.use((req, res, next) => {
   next(new ExpressError(404, "Route not found"));
 });
 
-// Custom Error Handler
 app.use(errorHandler);
 
 export default app;
