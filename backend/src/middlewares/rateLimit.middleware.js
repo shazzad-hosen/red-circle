@@ -1,6 +1,5 @@
 import rateLimit from "express-rate-limit";
 
-// Donation update limiter
 export const donationLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000,
   max: 3,
@@ -12,7 +11,6 @@ export const donationLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Availability toggle limiter
 export const availabilityLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 15,
@@ -24,7 +22,6 @@ export const availabilityLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Public Search limiter
 export const searchLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -36,7 +33,6 @@ export const searchLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Register Limiter
 export const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 4,
@@ -48,7 +44,6 @@ export const registerLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Login Limiter
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 7,

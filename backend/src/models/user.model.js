@@ -90,4 +90,10 @@ userSchema.virtual("isEligible").get(function () {
   return days >= 90;
 });
 
+userSchema.index({
+  bloodGroup: 1,
+  "location.city": 1,
+  "location.area": 1,
+});
+
 export const User = mongoose.model("User", userSchema);
