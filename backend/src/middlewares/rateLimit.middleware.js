@@ -2,7 +2,7 @@ import rateLimit from "express-rate-limit";
 
 export const donationLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000,
-  max: 3,
+  max: 7,
   message: {
     success: false,
     message: "Too many donation updates. Try again later.",
@@ -13,7 +13,7 @@ export const donationLimiter = rateLimit({
 
 export const availabilityLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 15,
+  max: 20,
   message: {
     success: false,
     message: "Too many availability changes. Slow down.",
@@ -35,7 +35,7 @@ export const searchLimiter = rateLimit({
 
 export const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 4,
+  max: 5,
   message: {
     success: false,
     message: "Too many registration attempts. Please try again later.",
@@ -46,7 +46,7 @@ export const registerLimiter = rateLimit({
 
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 7,
+  max: 9,
   message: {
     success: false,
     message: "Too many login attempts. Please try again later.",
