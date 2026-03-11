@@ -3,9 +3,6 @@
 Red Circle is a blood donation management backend built with **Node.js**, **Express**, and **MongoDB**.
 It provides **secure authentication**, **donor availability tracking**, **donor searching** based on **location** and **blood group**, **donation timing rules**, and **rate-limited APIs** to prevent abuse.
 
-> This repository contains backend only (frontend is handled separately).
-
-
 ## 🚀 Features
 
 ### 🔐 JWT Authentication
@@ -40,9 +37,13 @@ It provides **secure authentication**, **donor availability tracking**, **donor 
 
 - Centralized error handling
 
+- SHA-256 hashed refresh tokens in database
+
+- Multi-device Session support
+
 ### 📦 Scalable Project Structure
 
-- Controllers, routes, middlewares, utils, config
+- controllers, services, routes, middlewares, utils, config
 
 ## 🧱 Tech Stack
 
@@ -56,46 +57,32 @@ It provides **secure authentication**, **donor availability tracking**, **donor 
 
 - bcrypt
 
-- express-rate-limit
-
-- CORS (For Client Side)
-
-- dotenv
-
 ## 📂 Project Structure
 ```
 Red-Circle
-├─ LICENSE
-├─ README.md
 └─ backend
-   ├─ package-lock.json
-   ├─ package.json
-   ├─ server.js
-   └─ src
-      ├─ app.js
-      ├─ config
-      │  ├─ db.js
-      │  └─ env.js
-      ├─ controllers
-      │  ├─ auth.controller.js
-      │  └─ user.controller.js
-      ├─ middlewares
-      │  ├─ auth.middleware.js
-      │  ├─ error.middleware.js
-      │  ├─ rateLimit.middleware.js
-      │  ├─ validateLogin.middleware.js
-      │  └─ validateRegister.middleware.js
-      ├─ models
-      │  └─ user.model.js
-      ├─ routes
-      │  ├─ auth.routes.js
-      │  └─ user.routes.js
-      └─ utils
-         ├─ ExpressError.js
-         ├─ asyncHandler.js
-         └─ jwt.js
-
+    ├── server.js
+    ├── package.json  
+    ├── src/
+    |   ├── config/
+    │   ├── controllers/
+    │   ├── middlewares/
+    │   ├── models/
+    │   ├── routes/
+    │   ├── services/
+    │   ├── utils/
+    │   ├── app.js
 ```
+
+Separation of concerns is strictly maintained:
+
+- Controllers → Handle HTTP layer
+
+- Services → Contain business logic
+
+- Middlewares → Authentication & validation
+
+- Models → Database schema definitions
 
 ## ⚙️ Environment Variables
 
@@ -197,6 +184,8 @@ POST https://red-circle-backend.onrender.com/api/auth/register
 - Rate limiting prevents brute-force and spam attacks
 
 - Centralized error handling using custom **ExpressError**
+
+- SHA-256 hashed refresh tokens in database
 
 ## 📈 Future Improvements
 
